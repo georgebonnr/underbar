@@ -4,6 +4,9 @@ var _ = { };
 
 (function() {
 
+  var throwError = function (message) {
+    throw new Error(message);
+  };
   
   // COLLECTIONS
   // ===========
@@ -15,135 +18,90 @@ var _ = { };
 
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
-  _.first = function(array, n)
-  {
-      var newArray = [];
-      if (typeof n === 'undefined') {
-          n = 1;
-      }
-      else if ( n > array.length) {
-          n = array.length;
-      }
-      for (var i = 0; i < n; i++)
-      {
-          newArray.push(array[i]);
-      }
-      if (newArray.length === 1) {
-          return newArray[0];
-      }
-      else {
-          return newArray;
-      }
+  _.first = function(array, n) {
+    if (typeof n === 'undefined') {
+      return array.shift();
+    } else {
+      return array.slice(0, n);
+    }
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
-      if (typeof n === 'undefined') {
-          return array[array.length-1];
-      }
-      var subsetArray = _.first(array.reverse(), n);
-      return subsetArray.reverse();
+    if (typeof n === 'undefined') {
+      return array.pop();
+    } else {
+      return array.reverse().slice(0, n).reverse();
+    }
   };
 
   // Call iterator(value, key, collection) for each element of collection.
   // Accepts both arrays and objects.
   _.each = function(collection, iterator) {
-          for (var j in collection) {
-              var value = collection[j];
-              var key = j;
-              iterator(value, key, collection);
-          }
+    if (Array.isArray(collection)) {
+      for (var index = 0; index < collection.length; index++) {
+        var value = collection[index];
+        iterator(value, index, collection);
+      }
+    } else if (typeof collection.length === 'undefined') {
+      for (var key in collection) {
+        var value = collection[key];
+        iterator(value, key, collection);
+        }
+    } else {
+      throw new Error("sorry, _each() only accepts either an array or an object");
+    }
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
   // is not present in the array.
-  _.indexOf = function(array, target)
-  {
-    var match = [];
-    _.each(array, function()
-    {
-      if (arguments[0] == target)
-      {
-        match.push(arguments[1]);
+  _.indexOf = function (array, target) {
+    !Array.isArray(array) && throwError("_.indexOf() only accepts arrays");
+    for (var i = 0; i < array.length; i++) {
+      if (array[i] == target) {
+        return i;
       }
-    });
-    if (match.length < 1)
-    {
-      return -1;
     }
-    else
-    {
-      return parseInt(_.first(match), 10);
-    }
+    return -1;
   };
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, iterator) {
-    var match = [];
-    _.each(collection, function() {
-      if (iterator(arguments[0])) {
-        match.push(arguments[0]);
-      }
+    var matches = [];
+    _.each(collection, function(value) {
+      iterator(value) && matches.push(value);
     });
-    return match;
+    return matches;
   };
 
   // Return all elements of an array that don't pass a truth test.
+  // TIP: see if you can re-use _.select() here, without simply
+  // copying code in and modifying it
   _.reject = function(collection, iterator) {
-    // TIP: see if you can re-use _.select() here, without simply
-    // copying code in and modifying it
-
-    var rejectArray = [];
-    _.each(collection, function() {
-      var tempArray = [];
-      tempArray.push(arguments[0]);
-      if (_.filter(tempArray, iterator).length < 1) {
-        rejectArray.push(arguments[0]);
+    return _.filter(collection, function (value) {
+      if (iterator(value) == []) {
+        return value;
       }
     });
-    return rejectArray;
-
-    // ...So far I can only figure out a couple of ways to do this by specifically using _.select (_.filter)...
-    // One is calling filter on the collection and then building some sort of diff function to find the overlap of the filtered
-    // array and the original array and then remove that difference.  I chose not to go down that rabbit hole.  The other thing is to
-    // Loop through the collection and check filter against each individual element in the collection and then push each element for which
-    // filter comes up empty to a new array, which we then return...  I chose to go with this one.
-    // ...However, neither of these seems to be a more efficient solution than the copying / modifying solution below, even if it does involve
-    // copying code. Is there another, simpler way to solve this using _.filter that I haven't thought of yet?
-
-    // var notMatch = [];
-    // _.each(collection, function() {
-    //   if (!iterator(arguments[0])) {
-    //     notMatch.push(arguments[0]);
-    //   }
-    // });
-    // return notMatch
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
     var uniqArray = [];
-    var sortedArray = array.sort();
-    _.each(sortedArray, function(value, key, collection) {
-        value !== collection[parseInt(key)+1] && uniqArray.push(value);
+    _.each(array.sort(), function(value, index, array) {
+        value !== array[parseInt(index)+1] && uniqArray.push(value);
     });
     return uniqArray;
   };
 
   // Return the results of applying an iterator to each element.
-  _.map = function(array, iterator) {
-    // map() is a useful primitive iteration function that works a lot
-    // like each(), but in addition to running the operation on all
-    // the members, it also maintains an array of results.
-    var returnArr = [];
-    for (var j in array) {
-      var value = array[j];
-      var key = j;
-      var collection = array;
-      returnArr.push(iterator(value, key, collection));
-    }
-    return returnArr;
+  _.map = function(collection, iterator){
+    var results = [];
+    _.each(collection, function(value, key) {
+      results.push(iterator(value, key, collection));
+    })
+    return results;
   };
 
   /*
@@ -353,7 +311,7 @@ var _ = { };
     var alreadyCalled = {};
     var present = _.indexOf(alreadyCalled, func);
     if (present !== -1) {
-      return alredyCalled[present];
+      return alreadyCalled[present];
     } else {
       alreadyCalled.blah = func;
       return alreadyCalled.blah;
