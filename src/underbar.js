@@ -221,15 +221,10 @@ var _ = { };
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
-  _.extend = function(obj)
-  {
-    for (var i = 1; i < arguments.length; i++)
-    {
-      var keysArray = Object.keys(arguments[i]);
-      for (var x = 0; x < keysArray.length; x++)
-      {
-        var key = Object.keys(arguments[i])[x];
-        obj[key] = (arguments[i])[key];
+  _.extend = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        obj[key] = arguments[i][key];
       }
     }
     return obj;
