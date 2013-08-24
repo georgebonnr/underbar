@@ -192,16 +192,12 @@ var _ = { };
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
     var func;
-    if (iterator)
-    {
+    if (iterator) {
       func = iterator;
-    }
-    else
-    {
+    } else {
       func = function(i) { return i; };
     }
-    return !(_.every(collection, function(value)
-    {
+    return !(_.every(collection, function(value) {
       return !func(value);
     }, true));
   };
