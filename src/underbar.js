@@ -152,11 +152,10 @@ var _ = { };
     if (typeof initialValue === 'undefined') {
       initialValue = 0;
     }
-    var previousValue = initialValue;
     _.each(collection, function(value,key,collection) {
-      previousValue = iterator(previousValue, value);
+      initialValue = iterator(initialValue, value);
     });
-    return previousValue;
+    return initialValue;
   };
 
   // Determine if the array or object contains a given value (using `===`).
