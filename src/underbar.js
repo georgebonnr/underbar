@@ -232,23 +232,14 @@ var _ = { };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function(obj)
-  {
-    for (var i = 1; i < arguments.length; i++)
-    {
-      var keysArray = Object.keys(arguments[i]);
-      for (var x = 0; x < keysArray.length; x++)
-      {
-        var key = Object.keys(arguments[i])[x];
-        if (obj[key] === undefined) 
-        {
-          obj[key] = (arguments[i])[key];
-        }
+  _.defaults = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        if (typeof obj[key] === 'undefined') { obj[key] = arguments[i][key]; }
       }
     }
     return obj;
   };
-
 
   /**
    * FUNCTIONS
