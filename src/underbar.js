@@ -149,13 +149,13 @@ var _ = { };
   //   }, 0); // should be 6
   //
   _.reduce = function(collection, iterator, initialValue) {
-    if (initialValue === undefined) {
+    if (typeof initialValue === 'undefined') {
       initialValue = 0;
     }
     var previousValue = initialValue;
-      _.each(collection, function(value,key,collection) {
-      previousValue = iterator(previousValue, collection[key]);
-      });
+    _.each(collection, function(value,key,collection) {
+      previousValue = iterator(previousValue, value);
+    });
     return previousValue;
   };
 
