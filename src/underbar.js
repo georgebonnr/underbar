@@ -277,16 +277,17 @@ var _ = { };
   // Memoize should return a function that when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
+  
   _.memoize = function(func) {
     var alreadyCalled = {};
-    var present = _.indexOf(alreadyCalled, func);
-    if (present !== -1) {
-      return alreadyCalled[present];
-    } else {
-      alreadyCalled.blah = func;
-      return alreadyCalled.blah;
-    }
-    
+    return function() {
+      var key = func.apply(this, arguments);
+      if (_.contains(alreadyCalled, key)) {
+        return alreadyCalled[key];
+      } else {
+        return (alreadyCalled[key] = key);
+      }
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -311,17 +312,15 @@ var _ = { };
    */
 
   // Shuffle an array.
-  _.shuffle = function(array) 
-  {
+  _.shuffle = function(array) {
     var cloneArray = array.slice();
     var returnArray = [];
     function getRandomInt (min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    while (cloneArray.length > 0) 
-    {
+    while (cloneArray.length > 0) {
       var index = getRandomInt(0, cloneArray.length);
-      returnArray.push(cloneArray.splice(index, 1))
+      returnArray.push(cloneArray.splice(index, 1));
     }
     return returnArray;
   };
